@@ -1,0 +1,14 @@
+spring:
+  application:
+    name: scrum-aggregator
+  config:
+    import: optional:file:.env[.properties]
+
+server:
+  port: ${SERVER_PORT:}
+
+file:
+  report: ${FILE_REPORT:}
+  static-data: ${FILE_STATIC:}
+  output: ${FILE_OUTPUT:}
+  demo: ${FILE_DEMO:}
