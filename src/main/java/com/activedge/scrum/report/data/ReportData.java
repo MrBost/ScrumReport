@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
 
+import java.time.LocalDate;
+
 @Getter @Setter @ToString
 public class ReportData {
     @ExcelCell(1)
@@ -12,7 +14,7 @@ public class ReportData {
     @ExcelCell(2)
     private String assignedTo;
     @ExcelCell(3)
-    private String id;
+    private long id;
     @ExcelCell(4)
     private String title;
     @ExcelCell(5)

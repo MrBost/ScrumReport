@@ -19,10 +19,20 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Duration;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.util.Date;
+import java.util.Locale;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 @SpringBootApplication
 @ConfigurationPropertiesScan
@@ -44,6 +54,16 @@ public class ScrumReportApplication implements CommandLineRunner {
 	public void run(String... args) throws Exception {
 		System.out.println("Consolidator service started");
 		processor.squadDataProcessor();
+//		DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+////		DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yyyy");
+//		LocalDate ld = LocalDate.parse("19/04/2023",dtf).minusDays(3);
+////		String format = ld.format(df);
+//		System.out.println(ld);
+//		LocalDate today = LocalDate.now().plusDays(2);
+//		System.out.println(today);
+//		long between = DAYS.between(ld, today);
+//		System.out.println(between);
+
 	}
 
 

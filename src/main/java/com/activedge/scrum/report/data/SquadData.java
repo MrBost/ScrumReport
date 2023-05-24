@@ -4,6 +4,8 @@ import com.poiji.annotation.ExcelCell;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.time.LocalDate;
+
 @Getter @Setter
 public class SquadData {
     @ExcelCell(0)

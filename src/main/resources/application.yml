@@ -12,3 +12,8 @@ file:
   static-data: ${FILE_STATIC:}
   output: ${FILE_OUTPUT:}
   demo: ${FILE_DEMO:}
+
+pv:
+  value: ${PV_VALUE:}
+offset:
+  days: ${OFFSET_DAY}
