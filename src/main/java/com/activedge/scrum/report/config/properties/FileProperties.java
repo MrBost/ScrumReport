@@ -10,8 +10,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "file", ignoreUnknownFields = false)
 public class FileProperties {
-    private String report;
     private String staticData;
     private String output;
-    private String demo;
 }

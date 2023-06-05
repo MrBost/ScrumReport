@@ -3,6 +3,7 @@ package com.activedge.scrum.report.util;
 import com.activedge.scrum.report.data.OutputData;
 import com.activedge.scrum.report.data.OutputDataDTO;
 import com.activedge.scrum.report.data.ReportData;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFCellStyle;
@@ -120,55 +121,52 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
 
             Cell cell_11 = row.createCell(12, CellType.STRING);
             String state = data.getState();
-            if(state.equals(APPROVED.getValue())){
+            if(StringUtils.isNotBlank(state) && state.equals(APPROVED.getValue())){
                 red=249;green=191;blue=7;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(CHANGEMANAGEMENT.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(CHANGEMANAGEMENT.getValue())) {
                 red=149;green=197;blue=117;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(DEVELOPMENT.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(DEVELOPMENT.getValue())) {
                 red=241;green=171;blue=15;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(UAT.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(UAT.getValue())) {
                 red=244;green=216;blue=178;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(CONTROLLEDLIVE.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(CONTROLLEDLIVE.getValue())) {
                 red=149;green=197;blue=117;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(SYSTEMTESTING.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(SYSTEMTESTING.getValue())) {
                 red=255;green=255;blue=1;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(DONE.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(DONE.getValue())) {
                 red=96;green=148;blue=60;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(NEW.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(NEW.getValue())) {
                 red=244;green=216;blue=178;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else if (state.equals(ONHOLD.getValue())) {
+            } else if (StringUtils.isNotBlank(state) && state.equals(ONHOLD.getValue())) {
                 red=255;green=0;blue=0;
                 cell_11.setCellStyle(getStateStyle(red,green,blue));
-            } else{
-                cell_11.setCellStyle(normalStyle);
+            }else if (StringUtils.isNotBlank(state) && state.equals(SITCOMPLETED.getValue())) {
+                red=255;green=255;blue=1;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
+            } else if (StringUtils.isNotBlank(state) && state.equals(SITONGOING.getValue())) {
+                red=255;green=255;blue=1;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
+            } else if (StringUtils.isNotBlank(state) && state.equals(UATCOMPLETED.getValue())) {
+                red=244;green=216;blue=178;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
+            } else if (StringUtils.isNotBlank(state) && state.equals(UATONGOING.getValue())) {
+                red=244;green=216;blue=178;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
+            }else if (StringUtils.isNotBlank(state) && state.equals(DEVELOPMENTCOMPLETED.getValue())) {
+                red=249;green=191;blue=7;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
+            } else if (StringUtils.isNotBlank(state) && state.equals(DEVELOPMENTONGOING.getValue())) {
+                red=249;green=191;blue=7;
+                cell_11.setCellStyle(getStateStyle(red,green,blue));
             }
-//            else if (state.equals(SITCOMPLETED.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            } else if (state.equals(SITONGOING.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            } else if (state.equals(UATCOMPLETED.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            } else if (state.equals(UATONGOING.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            }else if (state.equals(DEVELOPMENTCOMPLETED.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            } else if (state.equals(DEVELOPMENTONGOING.getValue())) {
-//                red=8;green=4;blue=8;
-//                cell_11.setCellStyle(stateStyle);
-//            }
 
             cell_11.setCellValue(state);
 

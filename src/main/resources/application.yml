@@ -8,10 +8,8 @@ server:
   port: ${SERVER_PORT:}
 
 file:
-  report: ${FILE_REPORT:}
   static-data: ${FILE_STATIC:}
   output: ${FILE_OUTPUT:}
-  demo: ${FILE_DEMO:}
 
 pv:
   value: ${PV_VALUE:}

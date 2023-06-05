@@ -263,7 +263,7 @@ public abstract class ExportUtil<E extends Object>{
         font.setBold(true);
         font.setColor(IndexedColors.WHITE.getIndex());
         XSSFCellStyle style = wb.createCellStyle();
-        style.setFillForegroundColor(new XSSFColor(new Color(0,112,192)));
+        style.setFillForegroundColor(new XSSFColor(new Color(0,32,96)));
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
         style.setAlignment(HorizontalAlignment.CENTER);
         style.setVerticalAlignment(VerticalAlignment.CENTER);

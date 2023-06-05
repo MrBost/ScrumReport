@@ -95,7 +95,7 @@ public class ScrumReportProcessor {
             String filename = file.getName();
             String fileNameExtension = FilenameUtils.getExtension(filename);
             log.info("filename is: {}", filename);
-            if (file.isFile() && file.length() != 0 && fileNameExtension.equalsIgnoreCase("xlsx")) {
+            if (file.isFile() && file.length() != 0 && filename.equalsIgnoreCase("Static Data.xlsx")) {
                 PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(1).build();
                 try {
                     stateData = Poiji.fromExcel(file, StateData.class, options);
@@ -115,7 +115,7 @@ public class ScrumReportProcessor {
             String filename = file.getName();
             String fileNameExtension = FilenameUtils.getExtension(filename);
             log.info("filename is: {}", filename);
-            if (file.isFile() && file.length() != 0 && fileNameExtension.equalsIgnoreCase("xlsx")) {
+            if (file.isFile() && file.length() != 0 && filename.equalsIgnoreCase("Static Data.xlsx")) {
                 PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(2).build();
                 try {
                     dodData = Poiji.fromExcel(file, DodData.class, options);
@@ -128,37 +128,15 @@ public class ScrumReportProcessor {
         return dodData;
     }
 
-    public void outputDataProcessor() throws IOException {
-        String fileName = fileProperties.getOutput() + "/CTO Weekly Project.xlsx";
-//        AtomicReference<List<OutputData>> output = new AtomicReference<>();
-        Path path = Paths.get(fileProperties.getOutput());
-        File[] ff = path.toFile().listFiles();
-        Arrays.asList(ff).stream().forEach(file -> {
-            String filename = file.getName();
-            String fileNameExtension = FilenameUtils.getExtension(filename);
-            if (file.isFile() && file.length() != 0 && filename.equals("CTO Weekly Project 20230520.xlsx") && fileNameExtension.equalsIgnoreCase("xlsx")) {
-                log.info("filename is: {}", filename);
-                PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().sheetIndex(0).build();
-                try {
-                    outputData = Poiji.fromExcel(file, OutputDataDTO.class, options);
-                } catch (EmptyFileException e) {
-                    log.info("File is empty: {}", e.getLocalizedMessage());
-                }
-                log.info("output data count: {}", outputData.size());
-            }
-        });
-        outputReport(outputData,fileName);
-    }
-
     public List<ReportData> reportDataProcessor() throws IOException {
         AtomicReference<List<ReportData>> reportData = new AtomicReference<>();
-        Path path = Paths.get(fileProperties.getReport());
+        Path path = Paths.get(fileProperties.getStaticData());
         File[] ff = path.toFile().listFiles();
         Arrays.asList(ff).stream().forEach(file -> {
             String filename = file.getName();
             String fileNameExtension = FilenameUtils.getExtension(filename);
             log.info("filename is: {}", filename);
-            if (file.isFile() && file.length() != 0 && fileNameExtension.equalsIgnoreCase("xlsx")) {
+            if (file.isFile() && file.length() != 0 && filename.equalsIgnoreCase("Raw.xlsx")) {
                 PoijiOptions options = PoijiOptions.PoijiOptionsBuilder.settings().build();
                 try {
                     reportData.set(Poiji.fromExcel(file, ReportData.class, options));
@@ -173,13 +151,16 @@ public class ScrumReportProcessor {
                 ReportData data = new ReportData();
                 String itPath = a.getIterationPath();
                 String iteration = StringUtils.substringAfterLast(itPath, "\\");
-                String sprint = StringUtils.substringBefore(iteration, "Sprint").trim();
-                if (sprint.endsWith("-")) {
+                String sprint = "";
+                if(StringUtils.isNotBlank(iteration)){
+                    sprint = StringUtils.substringBefore(iteration, "Sprint").trim();
+                }
+                if (StringUtils.isNotBlank(sprint) && sprint.endsWith("-")) {
                     sprint = sprint.substring(0, sprint.length() - 1);
                 }
                 data.setSquad(sprint.trim());
                 String iterationPath = StringUtils.substringAfter(iteration, sprint);
-                if (iterationPath.startsWith("-")) {
+                if (StringUtils.isNotBlank(iterationPath) && iterationPath.startsWith("-")) {
                     iterationPath = iterationPath.trim().replace("-", "");
                 }
                 data.setIterationPath(iterationPath);
@@ -208,7 +189,7 @@ public class ScrumReportProcessor {
     }
 
     public void processor(List<SquadData> squad, List<ReportData> reportData, List<StateData> stateData, List<DodData> dodData) {
-        String filename = fileProperties.getOutput() + "/CTO Weekly Project " + today() + ".xlsx";
+        String filename = fileProperties.getOutput() + "/CTO Weekly Project Report_" + today() + ".xlsx";
         List<OutputData> reportState = new ArrayList<>();
         List<OutputData> reportSquad = new ArrayList<>();
         reportSquad = reportData.stream().map(it -> {
@@ -270,6 +251,9 @@ public class ScrumReportProcessor {
                     data.setSquad(report.getSquad());
                     data.setSNo(report.getSNo());
                 }
+                else{
+                    data.setSquad(it.getSquad());
+                }
             });
             return data;
         }).collect(Collectors.toList());
@@ -287,31 +271,20 @@ public class ScrumReportProcessor {
                 data.setExpectedEndDate(it.getExpectedEndDate());
                 data.setActivatedDate(it.getActivatedDate());
                 String formattedActivatedDate="";
+                long durationInSprint = 0;
                 LocalDate localActivatedDate = it.getActivatedDate();
                 LocalDate sprintDate = LocalDate.now().plusDays(1).plusDays(offsetDays);
-                long durationInSprint = DAYS.between(localActivatedDate, sprintDate);
+                if(localActivatedDate != null){
+                    durationInSprint = DAYS.between(localActivatedDate, sprintDate);
+                }
                 data.setDurationInSprint(durationInSprint);
-//                try{
-////                    localActivatedDate = LocalDate.parse(activatedDate,df);
-////                    formattedActivatedDate = localActivatedDate.format(df);
-////                    data.setActivatedDate(formattedActivatedDate);
-//                    long durationInSprint = DAYS.between(localActivatedDate, sprintDate);
-//                    data.setDurationInSprint(durationInSprint);
-//                }catch (DateTimeParseException ex){
-//                    try{
-////                        localActivatedDate = LocalDate.parse(activatedDate,dfA);
-////                        formattedActivatedDate = localActivatedDate.format(dfA);
-////                        data.setActivatedDate(formattedActivatedDate);
-//                        long durationInSprint = DAYS.between(localActivatedDate, sprintDate);
-//                        data.setDurationInSprint(durationInSprint);
-//                    }catch (DateTimeParseException e) {
-//                        e.getLocalizedMessage();
-//                    }
-//                }
                 data.setAssignedTo(it.getAssignedTo());
                 data.setSquad(it.getSquad());
                 data.setSNo(it.getSNo());
-                if(it.getState().trim().equals(state.getState().trim())){
+                String stateV = it.getState() != null ? it.getState().trim() : "";
+                String state2 = state.getState() !=null ? state.getState().trim() : "";
+
+                if(stateV.equals(state2)){
                     data.setStateValue(state.getScore());
                 }
             });
@@ -346,7 +319,11 @@ public class ScrumReportProcessor {
                 if(ratio>1){
                     ratio = 1.0/1.0;
                 }
-                data.setRatio(Double.parseDouble(formatter.format(ratio)));
+                try{
+                    data.setRatio(Double.parseDouble(formatter.format(ratio)));
+                }catch (NumberFormatException ex){
+                   log.error("Error formatting: {}",ex.getLocalizedMessage());
+                }
                 double disw = data.getDurationInSprintWks();
                 double pbi = pv / disw;
                 if(pbi >1){
@@ -360,40 +337,33 @@ public class ScrumReportProcessor {
                 String formattedCreatedDate="";
                 String formattedExpectedDate="";
                 LocalDate today = LocalDate.now().plusDays(offsetDays);
-                long pbItemAgeInDays = DAYS.between(localCreatedDate, today);
+                long pbItemAgeInDays= 0;
+                if(localCreatedDate != null){
+                    pbItemAgeInDays = DAYS.between(localCreatedDate, today);
+                }
+//                long pbItemAgeInDays = DAYS.between(localCreatedDate, today);
                 data.setPbiItemAgeInDays(pbItemAgeInDays);
-//                try{
-//                    LocalDate localCreatedDate = LocalDate.parse(createdDate,dtf);
-//                    formattedCreatedDate = localCreatedDate.format(df);
-//                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate));
-//                    long pbItemAgeInDays = DAYS.between(localCreatedDate, today);
-//                    data.setPbiItemAgeInDays(pbItemAgeInDays);
-//                }catch (DateTimeParseException ex){
-//                    try{
-//                        LocalDate localCreatedDate = LocalDate.parse(createdDate,dateTimeFormatter);
-//                        formattedCreatedDate = localCreatedDate.format(df);
-//                        data.setCreatedDate(LocalDate.parse(formattedCreatedDate));
-//                        long pbItemAgeInDays = DAYS.between(localCreatedDate, today);
-//                        data.setPbiItemAgeInDays(pbItemAgeInDays);
-//                    }catch (DateTimeParseException e) {
-//                        e.getLocalizedMessage();
-//                    }
-//                }
             });
             return data;
         }).collect(Collectors.toList());
+//        items.stream().forEach(a-> System.out.printf("squad %s activatedDate %s",a.getSquad(), a.getActivatedDate()).println());
         AtomicReference<BigDecimal> spiSquad = new AtomicReference<>(BigDecimal.ZERO);
         AtomicReference<String> key = new AtomicReference<>("");
-        Map<String, List<OutputData>> collect = items.stream().collect(Collectors.groupingBy(OutputData::getSquad));
+        try {
+            Map<String, List<OutputData>> collect = items.stream().collect(Collectors.groupingBy(OutputData::getSquad));
+            collect.entrySet().forEach(a->{
+                SpiData spi = new SpiData();
+                key.set(a.getKey());
+                spiSquad.set(extracted(a.getKey(), a.getValue()));
+                spi.setKey(key.get());
+                spi.setSpiPerSquad(spiSquad.get());
+                spiData.add(spi);
+            });
+        }catch (Exception ex) {
+            System.out.println("Failed: Squad cannot be blank " + ex.getLocalizedMessage());
+            log.error(ex.getMessage(), ex);
+        }
 
-        collect.entrySet().forEach(a->{
-            SpiData spi = new SpiData();
-            key.set(a.getKey());
-            spiSquad.set(extracted(a.getKey(), a.getValue()));
-            spi.setKey(key.get());
-            spi.setSpiPerSquad(spiSquad.get());
-            spiData.add(spi);
-        });
         spiList.addAll(spiData);
         spiItems = items.stream().map(item->{
             OutputData data = new OutputData();
