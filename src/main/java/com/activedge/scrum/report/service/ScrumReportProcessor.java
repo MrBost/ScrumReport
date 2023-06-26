@@ -24,12 +24,15 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 import static org.apache.commons.lang3.math.NumberUtils.max;
@@ -55,6 +58,9 @@ public class ScrumReportProcessor {
     SimpleDateFormat original = new SimpleDateFormat("dd/MM/yyyy");
     SimpleDateFormat target = new SimpleDateFormat("dd-MMM-yyyy");
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
+    DateTimeFormatter dtfc = DateTimeFormatter.ofPattern("MM/d/yyyy");
+    DateTimeFormatter dtfm = DateTimeFormatter.ofPattern("M/d/yyyy");
+    DateTimeFormatter dtfd = DateTimeFormatter.ofPattern("M/dd/yyyy");
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d/MM/yy");
     DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yy");
     DateTimeFormatter dfA = DateTimeFormatter.ofPattern("d-MMM-yy");
@@ -209,7 +215,25 @@ public class ScrumReportProcessor {
                         formattedCreatedDate = localCreatedDate.format(df);
                         data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
                     }catch (DateTimeParseException e) {
-                        e.getLocalizedMessage();
+                        try {
+                            LocalDate localCreatedDate = LocalDate.parse(cDate, dtfc);
+                            formattedCreatedDate = localCreatedDate.format(df);
+                            data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                        } catch (DateTimeParseException exe) {
+                            try {
+                                LocalDate localCreatedDate = LocalDate.parse(cDate, dtfm);
+                                formattedCreatedDate = localCreatedDate.format(df);
+                                data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                            } catch (DateTimeParseException exc) {
+                                try {
+                                    LocalDate localCreatedDate = LocalDate.parse(cDate, dtfd);
+                                    formattedCreatedDate = localCreatedDate.format(df);
+                                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                                } catch (DateTimeParseException exce) {
+                                    exce.printStackTrace();
+                                }
+                            }
+                        }
                     }
                 }
                 data.setState(it.getState());
@@ -270,12 +294,21 @@ public class ScrumReportProcessor {
                 data.setSquadTeam(it.getSquadTeam());
                 data.setExpectedEndDate(it.getExpectedEndDate());
                 data.setActivatedDate(it.getActivatedDate());
-                String formattedActivatedDate="";
+                long daysBetween = 0;
                 long durationInSprint = 0;
                 LocalDate localActivatedDate = it.getActivatedDate();
                 LocalDate sprintDate = LocalDate.now().plusDays(1).plusDays(offsetDays);
+                Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
+                        || date.getDayOfWeek() == DayOfWeek.SUNDAY;
+
                 if(localActivatedDate != null){
-                    durationInSprint = DAYS.between(localActivatedDate, sprintDate);
+                    daysBetween = DAYS.between(localActivatedDate, sprintDate);
+                }
+                List<LocalDate> workdays = Stream.iterate(localActivatedDate, date -> date.plusDays(1))
+                        .limit(daysBetween)
+                        .filter(isWeekend.negate()).collect(Collectors.toList());
+                if(!workdays.isEmpty()){
+                    durationInSprint = workdays.size();
                 }
                 data.setDurationInSprint(durationInSprint);
                 data.setAssignedTo(it.getAssignedTo());
@@ -332,21 +365,25 @@ public class ScrumReportProcessor {
                 BigDecimal spiBD = new BigDecimal(pbi).setScale(2, RoundingMode.HALF_UP);
                 data.setScheduleRatio(spiBD.doubleValue());
                 data.setSpi(Double.parseDouble(spiFormatter.format(data.getScheduleRatio() * data.getRatio())));
-//                String createdDate = String.valueOf(data.getCreatedDate());
                 LocalDate localCreatedDate = data.getCreatedDate();
-                String formattedCreatedDate="";
-                String formattedExpectedDate="";
                 LocalDate today = LocalDate.now().plusDays(offsetDays);
-                long pbItemAgeInDays= 0;
+                long pbItemAgeInDays = 0;
+                long daysBetween = 0;
+                Predicate<LocalDate> isWeekend = date -> date.getDayOfWeek() == DayOfWeek.SATURDAY
+                        || date.getDayOfWeek() == DayOfWeek.SUNDAY;
                 if(localCreatedDate != null){
-                    pbItemAgeInDays = DAYS.between(localCreatedDate, today);
+                    daysBetween = DAYS.between(localCreatedDate, today);
                 }
-//                long pbItemAgeInDays = DAYS.between(localCreatedDate, today);
+                List<LocalDate> workdays = Stream.iterate(localCreatedDate, date -> date.plusDays(1))
+                        .limit(daysBetween)
+                        .filter(isWeekend.negate()).collect(Collectors.toList());
+                if(!workdays.isEmpty()){
+                    pbItemAgeInDays = workdays.size();
+                }
                 data.setPbiItemAgeInDays(pbItemAgeInDays);
             });
             return data;
         }).collect(Collectors.toList());
-//        items.stream().forEach(a-> System.out.printf("squad %s activatedDate %s",a.getSquad(), a.getActivatedDate()).println());
         AtomicReference<BigDecimal> spiSquad = new AtomicReference<>(BigDecimal.ZERO);
         AtomicReference<String> key = new AtomicReference<>("");
         try {
