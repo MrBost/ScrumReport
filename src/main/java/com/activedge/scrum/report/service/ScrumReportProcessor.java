@@ -173,8 +173,10 @@ public class ScrumReportProcessor {
                 data.setActivatedDate(a.getActivatedDate());
                 data.setAssignedTo(a.getAssignedTo());
                 String createdDate = String.valueOf(a.getCreatedDate());
-                if (StringUtils.isNotBlank(createdDate)) {
+                if (StringUtils.isNotBlank(createdDate) && createdDate.contains(",")) {
                     createdDate = createdDate.split(",")[0];
+                }else{
+                    createdDate = createdDate.split("\\s+")[0];
                 }
                 data.setCreatedDate(createdDate);
                 data.setState(a.getState());
