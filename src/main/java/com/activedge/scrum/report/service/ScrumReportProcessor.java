@@ -55,8 +55,6 @@ public class ScrumReportProcessor {
     List<SpiData> spiList = new ArrayList<>();
     BigDecimal bal = BigDecimal.ZERO;
     BigDecimal spiSquad = BigDecimal.ZERO;
-    SimpleDateFormat original = new SimpleDateFormat("dd/MM/yyyy");
-    SimpleDateFormat target = new SimpleDateFormat("dd-MMM-yyyy");
     DateTimeFormatter dtf = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     DateTimeFormatter dtfc = DateTimeFormatter.ofPattern("MM/d/yyyy");
     DateTimeFormatter dtfm = DateTimeFormatter.ofPattern("M/d/yyyy");
@@ -64,7 +62,8 @@ public class ScrumReportProcessor {
     DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("d/MM/yy");
     DateTimeFormatter df = DateTimeFormatter.ofPattern("dd-MMM-yy");
     DateTimeFormatter dfA = DateTimeFormatter.ofPattern("d-MMM-yy");
-    List<OutputDataDTO> outputData = new ArrayList<>();
+    DateTimeFormatter dfdmy = DateTimeFormatter.ofPattern("d/M/yy");
+    DateTimeFormatter dfmdy = DateTimeFormatter.ofPattern("M/d/yy");
     List<StateData> stateData = new ArrayList<>();
     List<DodData> dodData = new ArrayList<>();
     DecimalFormat formatter = new DecimalFormat("0.0");
@@ -232,7 +231,19 @@ public class ScrumReportProcessor {
                                     formattedCreatedDate = localCreatedDate.format(df);
                                     data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
                                 } catch (DateTimeParseException exce) {
-                                    exce.printStackTrace();
+                                    try {
+                                        LocalDate localCreatedDate = LocalDate.parse(cDate, dfdmy);
+                                        formattedCreatedDate = localCreatedDate.format(df);
+                                        data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                                    } catch (DateTimeParseException excep) {
+                                        try {
+                                            LocalDate localCreatedDate = LocalDate.parse(cDate, dfmdy);
+                                            formattedCreatedDate = localCreatedDate.format(df);
+                                            data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                                        } catch (DateTimeParseException except) {
+                                            except.printStackTrace();
+                                        }
+                                    }
                                 }
                             }
                         }
