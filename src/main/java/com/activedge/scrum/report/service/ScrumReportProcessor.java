@@ -317,12 +317,17 @@ public class ScrumReportProcessor {
                 if(localActivatedDate != null){
                     daysBetween = DAYS.between(localActivatedDate, sprintDate);
                 }
-                List<LocalDate> workdays = Stream.iterate(localActivatedDate, date -> date.plusDays(1))
-                        .limit(daysBetween)
-                        .filter(isWeekend.negate()).collect(Collectors.toList());
-                if(!workdays.isEmpty()){
-                    durationInSprint = workdays.size();
+                try{
+                    List<LocalDate> workdays = Stream.iterate(localActivatedDate, date -> date.plusDays(1))
+                            .limit(daysBetween)
+                            .filter(isWeekend.negate()).collect(Collectors.toList());
+                    if(!workdays.isEmpty()){
+                        durationInSprint = workdays.size();
+                    }
+                }catch (Exception ex){
+                    log.error("Error getting workdays for: {} {}",daysBetween, ex.getLocalizedMessage());
                 }
+
                 data.setDurationInSprint(durationInSprint);
                 data.setAssignedTo(it.getAssignedTo());
                 data.setSquad(it.getSquad());
