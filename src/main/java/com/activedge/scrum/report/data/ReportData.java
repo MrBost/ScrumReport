@@ -24,6 +24,8 @@ public class ReportData {
     @ExcelCell(7)
     private String state;
     @ExcelCell(8)
+    private String stateChangeDate;
+    @ExcelCell(9)
     private String pbiDod;
     private String squad;
 }

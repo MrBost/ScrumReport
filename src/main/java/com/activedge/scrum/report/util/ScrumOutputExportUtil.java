@@ -47,11 +47,11 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
         CellStyle altDateStyle = getDateAlternatingRowStyle(wb);
 
         Row rowPV = sh.createRow(0);
-        Cell cellPV = rowPV.createCell(17);
+        Cell cellPV = rowPV.createCell(18);
         cellPV.setCellStyle(pvStyle);
         cellPV.setCellValue("PV");
 
-        Cell cellPVvalue = rowPV.createCell(18);
+        Cell cellPVvalue = rowPV.createCell(19);
         cellPVvalue.setCellStyle(pvStyle);
         cellPVvalue.setCellValue(pv);
 
@@ -116,10 +116,14 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
             cell_9.setCellValue(data.getExpectedEndDate());
 
             Cell cell_10 = row.createCell(11, CellType.STRING);
-            cell_10.setCellStyle(ratio_1dp);
-            cell_10.setCellValue(data.getDurationInSprintWks());
+            cell_10.setCellStyle(caeDateStyle);
+            cell_10.setCellValue(data.getStateChangeDate());
 
-            Cell cell_11 = row.createCell(12, CellType.STRING);
+            Cell cell_10a = row.createCell(12, CellType.STRING);
+            cell_10a.setCellStyle(ratio_1dp);
+            cell_10a.setCellValue(data.getDurationInSprintWks());
+
+            Cell cell_11 = row.createCell(13, CellType.STRING);
             String state = data.getState();
             if(StringUtils.isNotBlank(state) && state.equals(APPROVED.getValue())){
                 red=249;green=191;blue=7;
@@ -170,39 +174,39 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
 
             cell_11.setCellValue(state);
 
-            Cell cell_12 = row.createCell(13, CellType.STRING);
+            Cell cell_12 = row.createCell(14, CellType.STRING);
             cell_12.setCellStyle(cellStyle);
             cell_12.setCellValue(data.getDod());
 
-            Cell cell_13 = row.createCell(14, CellType.STRING);
+            Cell cell_13 = row.createCell(15, CellType.STRING);
             cell_13.setCellStyle(stateDurationStyle);
             cell_13.setCellValue(data.getStateValue());
 
-            Cell cell_14 = row.createCell(15, CellType.STRING);
+            Cell cell_14 = row.createCell(16, CellType.STRING);
             cell_14.setCellStyle(stateDurationStyle);
             cell_14.setCellValue(data.getStateDod());
 
-            Cell cell_17 = row.createCell(16, CellType.STRING);
+            Cell cell_17 = row.createCell(17, CellType.STRING);
             cell_17.setCellStyle(ratio_1dp);
             cell_17.setCellValue(data.getRatio());
 
-            Cell cell_18 = row.createCell(17, CellType.STRING);
+            Cell cell_18 = row.createCell(18, CellType.STRING);
             cell_18.setCellStyle(rstyle);
             cell_18.setCellValue(data.getScheduleRatio());
 
-            Cell cell_19 = row.createCell(18, CellType.STRING);
+            Cell cell_19 = row.createCell(19, CellType.STRING);
             cell_19.setCellStyle(rstyle);
             cell_19.setCellValue(data.getSpi());
 
-            Cell cell_20 = row.createCell(19, CellType.STRING);
+            Cell cell_20 = row.createCell(20, CellType.STRING);
             cell_20.setCellStyle(spiSquadStyle);
             cell_20.setCellValue(data.getSpiPerSquad().doubleValue());
 
-            Cell cell_21 = row.createCell(20, CellType.STRING);
+            Cell cell_21 = row.createCell(21, CellType.STRING);
             cell_21.setCellStyle(stateDurationStyle);
             cell_21.setCellValue(data.getDurationInSprint());
 
-            Cell cell_22 = row.createCell(21, CellType.STRING);
+            Cell cell_22 = row.createCell(22, CellType.STRING);
             cell_22.setCellStyle(stateDurationStyle);
             cell_22.setCellValue(data.getPbiItemAgeInDays());
 

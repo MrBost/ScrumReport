@@ -29,6 +29,7 @@ public class OutputData {
     private long durationInSprint;
     private long pbiItemAgeInDays;
     private int sNo;
+    private LocalDate stateChangeDate;
 
 
 }

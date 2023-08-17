@@ -171,13 +171,12 @@ public class ScrumReportProcessor {
                 data.setIterationPath(iterationPath);
                 data.setActivatedDate(a.getActivatedDate());
                 data.setAssignedTo(a.getAssignedTo());
-                String createdDate = String.valueOf(a.getCreatedDate());
-                if (StringUtils.isNotBlank(createdDate) && createdDate.contains(",")) {
-                    createdDate = createdDate.split(",")[0];
-                }else{
-                    createdDate = createdDate.split("\\s+")[0];
-                }
+                String createdDate = a.getCreatedDate();
+                String stateChangeDate = a.getStateChangeDate();
+                createdDate = extractDate(createdDate);
                 data.setCreatedDate(createdDate);
+                stateChangeDate = extractDate(stateChangeDate);
+                data.setStateChangeDate(stateChangeDate);
                 data.setState(a.getState());
                 String dod = a.getPbiDod();
                 if(StringUtils.isBlank(dod)){
@@ -195,6 +194,15 @@ public class ScrumReportProcessor {
         return reportDataList;
     }
 
+    private String extractDate(String derivedDate) {
+        if (StringUtils.isNotBlank(derivedDate) && derivedDate.contains(",")) {
+            derivedDate = derivedDate.split(",")[0];
+        }else{
+            derivedDate = derivedDate.split("\\s+")[0];
+        }
+        return derivedDate;
+    }
+
     public void processor(List<SquadData> squad, List<ReportData> reportData, List<StateData> stateData, List<DodData> dodData) {
         String filename = fileProperties.getOutput() + "/CTO Weekly Project Report_" + today() + ".xlsx";
         List<OutputData> reportState = new ArrayList<>();
@@ -205,50 +213,13 @@ public class ScrumReportProcessor {
                 data.setId(it.getId());
                 data.setTitle(it.getTitle());
                 String cDate = it.getCreatedDate();
+                String stateChangeDate = it.getStateChangeDate();
                 String formattedCreatedDate="";
-                try{
-                    LocalDate localCreatedDate = LocalDate.parse(cDate,dtf);
-                    formattedCreatedDate = localCreatedDate.format(df);
-                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
-                }catch (DateTimeParseException ex){
-                    try{
-                        LocalDate localCreatedDate = LocalDate.parse(cDate,dateTimeFormatter);
-                        formattedCreatedDate = localCreatedDate.format(df);
-                        data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
-                    }catch (DateTimeParseException e) {
-                        try {
-                            LocalDate localCreatedDate = LocalDate.parse(cDate, dtfc);
-                            formattedCreatedDate = localCreatedDate.format(df);
-                            data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
-                        } catch (DateTimeParseException exe) {
-                            try {
-                                LocalDate localCreatedDate = LocalDate.parse(cDate, dtfm);
-                                formattedCreatedDate = localCreatedDate.format(df);
-                                data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
-                            } catch (DateTimeParseException exc) {
-                                try {
-                                    LocalDate localCreatedDate = LocalDate.parse(cDate, dtfd);
-                                    formattedCreatedDate = localCreatedDate.format(df);
-                                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
-                                } catch (DateTimeParseException exce) {
-                                    try {
-                                        LocalDate localCreatedDate = LocalDate.parse(cDate, dfdmy);
-                                        formattedCreatedDate = localCreatedDate.format(df);
-                                        data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
-                                    } catch (DateTimeParseException excep) {
-                                        try {
-                                            LocalDate localCreatedDate = LocalDate.parse(cDate, dfmdy);
-                                            formattedCreatedDate = localCreatedDate.format(df);
-                                            data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
-                                        } catch (DateTimeParseException except) {
-                                            except.printStackTrace();
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                String formattedStateChangeDate = "";
+                formattedCreatedDate = formatDate(cDate);
+                formattedStateChangeDate = formatDate(stateChangeDate);
+                data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
+                data.setStateChangeDate(LocalDate.parse(formattedStateChangeDate, df));
                 data.setState(it.getState());
                 data.setDod(it.getPbiDod());
                 data.setIterationPath(it.getIterationPath());
@@ -301,6 +272,7 @@ public class ScrumReportProcessor {
                 data.setId(it.getId());
                 data.setTitle(it.getTitle());
                 data.setCreatedDate(it.getCreatedDate());
+                data.setStateChangeDate(it.getStateChangeDate());
                 data.setState(it.getState());
                 data.setDod(it.getDod());
                 data.setIterationPath(it.getIterationPath());
@@ -348,6 +320,7 @@ public class ScrumReportProcessor {
                 data.setId(it.getId());
                 data.setTitle(it.getTitle());
                 data.setCreatedDate(it.getCreatedDate());
+                data.setStateChangeDate(it.getStateChangeDate());
                 data.setState(it.getState());
                 data.setDod(it.getDod());
                 data.setIterationPath(it.getIterationPath());
@@ -428,6 +401,7 @@ public class ScrumReportProcessor {
                 data.setId(item.getId());
                 data.setTitle(item.getTitle());
                 data.setCreatedDate(item.getCreatedDate());
+                data.setStateChangeDate(item.getStateChangeDate());
                 data.setState(item.getState());
                 data.setDod(item.getDod());
                 data.setIterationPath(item.getIterationPath());
@@ -455,6 +429,54 @@ public class ScrumReportProcessor {
         consolidatedReport(spiItems, filename);
     }
 
+    private String formatDate(String cDate) {
+        String formattedCreatedDate = null;
+        try{
+            LocalDate localCreatedDate = LocalDate.parse(cDate,dtf);
+            formattedCreatedDate = localCreatedDate.format(df);
+//            data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
+        }catch (DateTimeParseException ex){
+            try{
+                LocalDate localCreatedDate = LocalDate.parse(cDate,dateTimeFormatter);
+                formattedCreatedDate = localCreatedDate.format(df);
+//                data.setCreatedDate(LocalDate.parse(formattedCreatedDate,df));
+            }catch (DateTimeParseException e) {
+                try {
+                    LocalDate localCreatedDate = LocalDate.parse(cDate, dtfc);
+                    formattedCreatedDate = localCreatedDate.format(df);
+//                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                } catch (DateTimeParseException exe) {
+                    try {
+                        LocalDate localCreatedDate = LocalDate.parse(cDate, dtfm);
+                        formattedCreatedDate = localCreatedDate.format(df);
+//                        data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                    } catch (DateTimeParseException exc) {
+                        try {
+                            LocalDate localCreatedDate = LocalDate.parse(cDate, dtfd);
+                            formattedCreatedDate = localCreatedDate.format(df);
+//                            data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                        } catch (DateTimeParseException exce) {
+                            try {
+                                LocalDate localCreatedDate = LocalDate.parse(cDate, dfdmy);
+                                formattedCreatedDate = localCreatedDate.format(df);
+//                                data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                            } catch (DateTimeParseException excep) {
+                                try {
+                                    LocalDate localCreatedDate = LocalDate.parse(cDate, dfmdy);
+                                    formattedCreatedDate = localCreatedDate.format(df);
+//                                    data.setCreatedDate(LocalDate.parse(formattedCreatedDate, df));
+                                } catch (DateTimeParseException except) {
+                                    except.printStackTrace();
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return formattedCreatedDate;
+    }
+
     private BigDecimal extracted(String key, List<OutputData> value) {
         List<BigDecimal> netSpi = new ArrayList<>();
         value.stream().forEach(v->{
@@ -474,7 +496,7 @@ public class ScrumReportProcessor {
         try (Workbook workbook = (new ScrumOutputExportUtil(pv))
                 .exportExcel(
                         new String[]{"S/N", "Squad", "Assigned To", "Squad Team", "Iteration Path/Sprint(s)", "ID", "Work Item Type",
-                                "Title", "Created Date", "Activated Date", "Expected End Date", "Duration in Sprint (wks)", "State", "DOD", "State (Value)",
+                                "Title", "Created Date", "Activated Date", "Expected End Date","State Change Date", "Duration in Sprint (wks)", "State", "DOD", "State (Value)",
                                 "State (DoD)", "Ratio(State/DOD)", "Schedule Ratio", "SPI", "SPI per Squad", "Duration in Sprint", "PBI Item Age in days"},
                         items, "AgileScrumPBI."); FileOutputStream fos = new FileOutputStream(new File(fileName))) {
             System.out.println("Writing to file.......");
