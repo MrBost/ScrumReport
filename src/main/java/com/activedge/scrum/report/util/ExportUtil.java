@@ -167,6 +167,32 @@ public abstract class ExportUtil<E extends Object>{
         return style;
     }
 
+    protected static CellStyle getStateChangeDateFormat(XSSFWorkbook wb){
+        CreationHelper createHelper = wb.getCreationHelper();
+//        CellStyle styles = wb.createCellStyle();
+        XSSFCellStyle style = wb.createCellStyle();
+        style.setDataFormat(
+                createHelper.createDataFormat().getFormat("dd-MMM-yy"));
+        XSSFFont font = wb.createFont();
+        font.setFontName("Calibri");
+        font.setFontHeightInPoints((short) 8);
+
+        style.setFillForegroundColor(new XSSFColor(new java.awt.Color(178,190,181)));
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setAlignment(HorizontalAlignment.LEFT);
+        style.setVerticalAlignment(VerticalAlignment.TOP);
+        style.setBorderBottom(BorderStyle.THIN);
+        style.setBottomBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderLeft(BorderStyle.THIN);
+        style.setLeftBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderRight(BorderStyle.THIN);
+        style.setRightBorderColor(IndexedColors.BLACK.getIndex());
+        style.setBorderTop(BorderStyle.THIN);
+        style.setTopBorderColor(IndexedColors.BLACK.getIndex());
+        style.setWrapText(true);
+        style.setFont(font);
+        return style;
+    }
     protected static CellStyle getDateFormat(XSSFWorkbook wb){
         CreationHelper createHelper = wb.getCreationHelper();
         CellStyle style = wb.createCellStyle();
@@ -396,7 +422,7 @@ public abstract class ExportUtil<E extends Object>{
             last = i;
             for (int j = i + 1; j < sh.getPhysicalNumberOfRows(); j++) {
                 String cell1 = sh.getRow(i)!=null ? sh.getRow(i).getCell(1).toString() : "";
-                String cell2 = sh.getRow(j)!=null ? sh.getRow(j).getCell(1).toString() :"";
+                String cell2 = sh.getRow(j)!=null ? sh.getRow(j).getCell(1).toString() : "";
                 if (cell1.equals(cell2)) {
                     last = j;
                     System.out.println(cell1 +" >>> "+ cell2 +" first "+first+" last "+last);
@@ -404,7 +430,7 @@ public abstract class ExportUtil<E extends Object>{
             }
             try{
                 mergeRegion(first,last);
-                CellRangeAddress cellRangeAddress = new CellRangeAddress(first,last, 19, 19);
+                CellRangeAddress cellRangeAddress = new CellRangeAddress(first,last, 20, 20);
                 sh.addMergedRegion(cellRangeAddress);
             }catch (Exception ex){
                 System.out.println("cannot merge a single cell");

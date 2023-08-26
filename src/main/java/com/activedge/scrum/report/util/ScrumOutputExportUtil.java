@@ -40,6 +40,7 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
         CellStyle ratio_1dp;
         CellStyle rstyle;
         CellStyle spiSquadStyle = getSpiSquadStyle();
+        CellStyle stateChangeStyle = getStateChangeDateFormat(wb);
         CellStyle ratioStyle = getRatio(wb);
         CellStyle altRatioStyle = getRatioAlternatingRowStyle(wb);
         CellStyle _1dpRatio = getRatio_1dp(wb);
@@ -116,7 +117,7 @@ public class ScrumOutputExportUtil extends ExportUtil<OutputData> {
             cell_9.setCellValue(data.getExpectedEndDate());
 
             Cell cell_10 = row.createCell(11, CellType.STRING);
-            cell_10.setCellStyle(caeDateStyle);
+            cell_10.setCellStyle(stateChangeStyle);
             cell_10.setCellValue(data.getStateChangeDate());
 
             Cell cell_10a = row.createCell(12, CellType.STRING);
